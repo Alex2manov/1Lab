@@ -2,6 +2,7 @@
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.json.JSONObject;
 import java.util.Objects;
 
 public class Client {
@@ -30,10 +31,49 @@ public class Client {
     );
 
 
-    //Конструктор
+    //Конструктор 1
     public Client(int clientId, String firstName, String lastName, String phone, String email) {
 
         this.clientId = clientId;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.phone = phone;
+        this.email = email;
+    }
+
+    // 2. КОНСТРУКТОР ИЗ СТРОКИ
+    // Формат: "1;Иван;Петров;+79991234567;ivan@mail.ru"
+    public Client(String data) {
+        String[] parts = data.split(";");
+        if (parts.length != 5) throw new IllegalArgumentException("String must have 5 parts separated by ;");
+
+        int id = Integer.parseInt(parts[0].trim());
+        String firstName = parts[1].trim();
+        String lastName = parts[2].trim();
+        String phone = parts[3].trim();
+        String email = parts[4].trim().isEmpty() ? null : parts[4].trim();
+
+        new Client(id, lastName, firstName, phone, email);
+
+        this.clientId = id;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.phone = phone;
+        this.email = email;
+    }
+
+    // 3. КОНСТРУКТОР ИЗ JSON
+    // Пример: {"clientId":1,"firstName":"Иван","lastName":"Петров","phone":"+79991234567","email":"ivan@mail.ru"}
+    public Client(JSONObject json) {
+        int id = json.getInt("clientId");
+        String firstName = json.getString("firstName");
+        String lastName = json.getString("lastName");
+        String phone = json.getString("phone");
+        String email = json.has("email") && !json.isNull("email") ? json.getString("email") : null;
+
+        new Client(id, lastName, firstName, phone, email);
+
+        this.clientId = id;
         this.firstName = firstName;
         this.lastName = lastName;
         this.phone = phone;
