@@ -11,6 +11,11 @@ public class Client {
     private String phone;
     private String email;
 
+    // Константы для валидации
+    private static final int MAX_NAME_LENGTH = 100;
+    private static final int MAX_PHONE_LENGTH = 20;
+    private static final int MAX_EMAIL_LENGTH = 255;
+
     // Регулярные выражения для валидации
     private static final Pattern EMAIL_PATTERN = Pattern.compile(
             "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$"
@@ -27,10 +32,6 @@ public class Client {
 
     //Конструктор
     public Client(int clientId, String firstName, String lastName, String phone, String email) {
-        validateFirstName(firstName);
-        validateLastName(lastName);
-        validatePhone(phone);
-        validateEmail(email);
 
         this.clientId = clientId;
         this.firstName = firstName;
@@ -39,30 +40,63 @@ public class Client {
         this.email = email;
     }
 
-    // Статические методы валидации
+    // Статические методы валидации (общие)
 
-    public static void validateFirstName(String firstName) {
-        if (firstName.length() > 100) {
-            throw new IllegalArgumentException("Имя не может превышать 100 символов");
+    private static void validateNotNullOrBlank(String value, String fieldName) {
+        if (value == null || value.isBlank()) {
+            throw new IllegalArgumentException(fieldName + " не может быть пустым");
         }
     }
 
-    public static void validateLastName(String lastName) {
-        if (lastName.length() > 100) {
-            throw new IllegalArgumentException("Фамилия не может превышать 100 символов");
+    private static void validateMaxLength(String value, int maxLength, String fieldName) {
+        if (value != null && value.length() > maxLength) {
+            throw new IllegalArgumentException(fieldName + " не может превышать " + maxLength + " символов");
         }
     }
 
-    public static void validatePhone(String phone) {
-        if (phone.length() > 20) {
-            throw new IllegalArgumentException("Телефон не может превышать 20 символов");
+    //Общий патерн для методов
+    private static void validatePattern(String value, Pattern pattern, String errorMessage) {
+        if (value != null && !pattern.matcher(value).matches()) {
+            throw new IllegalArgumentException(errorMessage);
         }
     }
 
-    public static void validateEmail(String email) {
-        if (email.length() > 255) {
-            throw new IllegalArgumentException("Email не может превышать 255 символов");
+    // Специфичные методы валидации
+    private static void validateName(String name, String fieldName) {
+        validateNotNullOrBlank(name, fieldName);
+        validateMaxLength(name, MAX_NAME_LENGTH, fieldName);
+        validatePattern(name, NAME_PATTERN, fieldName + " содержит недопустимые символы");
+    }
+
+    private static void validatePhone(String phone) {
+        validateNotNullOrBlank(phone, "Телефон");
+        validateMaxLength(phone, MAX_PHONE_LENGTH, "Телефон");
+        validatePattern(phone, PHONE_PATTERN, "Неверный формат телефона");
+    }
+
+    private static void validateEmail(String email) {
+        if (email != null && !email.isBlank()) {
+            validateMaxLength(email, MAX_EMAIL_LENGTH, "Email");
+            validatePattern(email, EMAIL_PATTERN, "Неверный формат email");
         }
+    }
+
+    private static void validateId(int id) {
+        if (id < 0) {
+            throw new IllegalArgumentException("ID клиента не может быть отрицательным");
+        }
+    }
+
+    // Валидация всего объекта
+    public static void validateClient(Client client) {
+        if (client == null) {
+            throw new IllegalArgumentException("Клиент не может быть null");
+        }
+        validateId(client.clientId);
+        validateName(client.firstName, "Имя");
+        validateName(client.lastName, "Фамилия");
+        validatePhone(client.phone);
+        validateEmail(client.email);
     }
 
     // Геттеры и сеттеры для всех полей (инкапсуляция)
@@ -77,7 +111,7 @@ public class Client {
     }
 
     public void setFirstName(String firstName) {
-        validateFirstName(firstName);
+        validateName(firstName, "Имя");
         this.firstName = firstName;
     }
 
@@ -86,7 +120,7 @@ public class Client {
     }
 
     public void setLastName(String lastName) {
-        validateLastName(lastName);
+        validateName(lastName,"Фамилия");
         this.lastName = lastName;
     }
 
