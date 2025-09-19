@@ -80,6 +80,38 @@ public class Client {
         this.email = email;
     }
 
+    // Полная строка
+    @Override
+    public String toString() {
+        return String.format("Client{id=%d, firstName='%s', lastName='%s', phone='%s', email='%s'}",
+                clientId, firstName, lastName, phone, email);
+    }
+
+    // Краткая строка
+    public String toShortString() {
+        String fi = firstName == null || firstName.isEmpty() ? "" : (firstName.charAt(0) + ".");
+        return String.format("%s %s", lastName, fi).trim();
+    }
+
+    // Сравнение объектов
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Client)) return false;
+        Client other = (Client) o;
+        return clientId == other.clientId &&
+                firstName.equals(other.firstName) &&
+                lastName.equals(other.lastName) &&
+                phone.equals(other.phone) &&
+                ((email == null && other.email == null) ||
+                        (email != null && email.equals(other.email)));
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(clientId, firstName, lastName, phone, email);
+    }
+
     // Статические методы валидации (общие)
 
     private static void validateNotNullOrBlank(String value, String fieldName) {
