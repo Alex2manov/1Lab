@@ -1,22 +1,28 @@
 
-public class ClientLITTLE {
-    private String lastName;
-    private String initials;
-    private String phone;
-    private String email;
-
-    public ClientLITTLE(String lastName, String firstName, String phone, String email) {
-        this.lastName = lastName;
-        this.initials = (firstName == null || firstName.isEmpty() ? "" : firstName.charAt(0) + ".");
-        this.phone = phone;
-        this.email = email;
-    }
-
-    public String getLittleInfo() {
-        String contactInfo = phone != null ? "phone: " + phone : "";
-        if (email != null && !email.isEmpty()) {
-            contactInfo += contactInfo.isEmpty() ? "email: " + email : ", email: " + email;
+    public class ClientLITTLE extends Client {
+        public ClientLITTLE(int ClientId, String lastName, String firstName, String phone, String email){
+            super(ClientId, lastName, firstName, phone, email);
         }
-        return String.format("%s %s%s", lastName, initials, contactInfo.isEmpty() ? "" : ", " + contactInfo);
+
+        // Конструктор краткой версии
+        public ClientLITTLE(Client client) {
+            super(client.getClientId(), client.getLastName(), client.getFirstName(), client.getPhone(),client.getEmail());
+        }
+
+        @Override
+        public String toString() {
+            return toShortString(); // вывод краткой версии
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (!(o instanceof ClientLITTLE)) return false;
+            ClientLITTLE other = (ClientLITTLE) o;
+            return this.toShortString().equals(other.toShortString());
+        }
+        @Override
+        public int hashCode() {
+            return toShortString().hashCode();
+        }
     }
-}
